@@ -45,12 +45,12 @@ def save_network(filename, weights_dict):
       value is a numpy array. This is the dictionary of values that is to be
       saved.
   """
-  if tf.gfile.Exists(filename):
-    tf.gfile.DeleteRecursively(filename)
-  tf.gfile.MakeDirs(filename)
+  if tf.io.gfile.exists(filename):
+    tf.io.gfile.rmtree(filename)
+  tf.io.gfile.makedirs(filename)
 
   for k, v in weights_dict.items():
-    with tf.gfile.FastGFile(os.path.join(filename, k + '.npy'), 'w') as fp:
+    with tf.io.gfile.GFile(os.path.join(filename, k + '.npy'), 'wb') as fp:
       np.save(fp, v)
 
 
@@ -75,14 +75,14 @@ def restore_network(filename):
   Raises:
     ValueError: If filename does not exist.
   """
-  if not tf.gfile.Exists(filename):
+  if not tf.io.gfile.exists(filename):
     raise ValueError('Filename {} does not exist.'.format(filename))
 
   weights_dict = {}
 
-  for basename in tf.gfile.ListDirectory(filename):
+  for basename in tf.io.gfile.listdir(filename):
     name = basename.split('.')[0]
-    with tf.gfile.FastGFile(os.path.join(filename, basename)) as fp:
+    with tf.io.gfile.GFile(os.path.join(filename, basename), 'rb') as fp:
       weights_dict[name] = np.load(fp)
 
   return weights_dict
@@ -150,7 +150,7 @@ def read_log(directory, name='test', tail=0):
       'accuracy': [],
   }
 
-  with tf.gfile.GFile(paths.log(directory, name)) as fp:
+  with tf.io.gfile.GFile(paths.log(directory, name)) as fp:
     reader = csv.reader(fp)
     for row in reader:
       output['iteration'].append(float(row[1]))
@@ -177,7 +177,7 @@ def write_log(data, directory, name='test'):
       to be stored.
     name: What to call the data file itself.
   """
-  with tf.gfile.GFile(paths.log(directory, name), 'w') as fp:
+  with tf.io.gfile.GFile(paths.log(directory, name), 'w') as fp:
     for loss, it, acc in zip(data['loss'], data['iteration'], data['accuracy']):
       fp.write(','.join(
           ('iteration',
