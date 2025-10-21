@@ -27,7 +27,8 @@ from lottery_ticket.foundations import save_restore
 from lottery_ticket.foundations import trainer
 from lottery_ticket.foundations import union
 from lottery_ticket.mnist_fc import constants
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 
 
 def train(output_dir,

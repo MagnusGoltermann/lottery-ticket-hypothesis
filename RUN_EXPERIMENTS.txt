@@ -1,0 +1,58 @@
+Project: Lottery Ticket Hypothesis (MNIST FC) - Replication Guide
+
+Prerequisites
+- Python 3.11 recommended
+- Git installed
+
+1) Clone and enter the repo (on a clean VM)
+- git clone https://github.com/MagnusGoltermann/lottery-ticket-hypothesis.git
+- cd lottery-ticket-hypothesis
+
+2) Create and activate a virtual environment
+Windows (PowerShell):
+- python -m venv .venv
+- .\.venv\Scripts\Activate.ps1
+Linux/macOS:
+- python3 -m venv .venv
+- source .venv/bin/activate
+
+3) Install dependencies via setup
+- python -m pip install --upgrade pip
+- python setup.py install
+
+4) Download MNIST data
+- python -m lottery_ticket.mnist_fc.download_data
+Data saved under: data/mnist/{x_train.npy,x_test.npy,y_train.npy,y_test.npy}
+
+5) Minimal sanity checks
+- python -m lottery_ticket.mnist_fc.runners.train --output_dir=mnist_fc_data/smoke --training_len="('iterations', 1000)"
+- python -m lottery_ticket.mnist_fc.runners.lottery_experiment --output_dir=data/experiments/smoke --iterations=1 --training_len="('iterations', 1000)"
+
+6) Full replication experiments
+- Generate argfile lines (20 trials by default):
+  python mnist_fc/argfiles/lottery_experiment_argfile.py > args.txt
+- Run all trials using the argfile runner:
+  python argfile_runner.py mnist_fc/runners/lottery_experiment.py args.txt
+Outputs
+- For each trial and level: {output_dir}/{level}/same_init/
+  - initial/, final/, masks/
+  - train.log, test.log, validate.log
+  - summaries/ (TensorBoard)
+
+7) Control experiment (reinitialize)
+- Example single level:
+  python -m lottery_ticket.mnist_fc.runners.reinitialize --output_dir=data/experiments/reinit_trial --iterations=1 --training_len="('iterations', 1000)"
+
+8) Inspect results quickly
+- tail -n 5 data/experiments/smoke/0/same_init/test.log
+- tensorboard --logdir data/experiments/smoke/0/same_init/summaries
+
+9) Analysis scripts
+- Parse logs to CSV/JSON:
+  python analysis/parse_results.py --root data/experiments --out analysis/results.csv
+- Plot accuracy vs. sparsity and training curves:
+  python analysis/plot_results.py --csv analysis/results.csv --outdir analysis/plots
+
+Notes
+- This repo uses TensorFlow 2 in TF1-compat mode.
+- If TF wheels fail on your VM, ensure Python 3.11, CPU AVX support, or preinstall: python -m pip install "tensorflow==2.20.0"

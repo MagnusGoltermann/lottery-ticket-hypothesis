@@ -26,3 +26,6 @@ from __future__ import print_function
 MNIST_LOCATION = 'data/mnist'
 
 EXPERIMENT_PATH = 'mnist_fc_data'
+
+# Optional: path for FashionMNIST to avoid import errors in constants.py
+FASHIONMNIST_LOCATION = 'data/fashion_mnist'

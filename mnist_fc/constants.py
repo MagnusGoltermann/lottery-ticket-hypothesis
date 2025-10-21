@@ -22,7 +22,8 @@ import functools
 import os
 from lottery_ticket.foundations import paths
 from lottery_ticket.mnist_fc import locations
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 
 HYPERPARAMETERS = {'layers': [(300, tf.nn.relu), (100, tf.nn.relu), (10, None)]}
 

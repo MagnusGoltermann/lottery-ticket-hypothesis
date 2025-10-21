@@ -16,7 +16,8 @@
 
 from lottery_ticket.foundations import paths
 from lottery_ticket.foundations import save_restore
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 
 
 def train(sess, dataset, model, optimizer_fn, training_len, output_dir,
@@ -58,9 +59,9 @@ def train(sess, dataset, model, optimizer_fn, training_len, output_dir,
   # Optional operations to perform before training.
   if params.get('save_summaries', False):
     writer = tf.summary.FileWriter(paths.summaries(output_dir))
-    train_file = tf.gfile.GFile(paths.log(output_dir, 'train'), 'w')
-    test_file = tf.gfile.GFile(paths.log(output_dir, 'test'), 'w')
-    validate_file = tf.gfile.GFile(paths.log(output_dir, 'validate'), 'w')
+    train_file = tf.io.gfile.GFile(paths.log(output_dir, 'train'), 'w')
+    test_file = tf.io.gfile.GFile(paths.log(output_dir, 'test'), 'w')
+    validate_file = tf.io.gfile.GFile(paths.log(output_dir, 'validate'), 'w')
 
   if params.get('save_network', False):
     save_restore.save_network(paths.initial(output_dir), initial_weights)
